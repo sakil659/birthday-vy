@@ -1,0 +1,1519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Happy Birthday 🎂</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    /* ============================================================
+       CSS VARIABLES & RESET
+    ============================================================ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0d0a14;
+      --bg2:       #130f1e;
+      --pink:      #f2a7c3;
+      --rose:      #e06fa0;
+      --purple:    #b57bee;
+      --lavender:  #d4b3f7;
+      --muted:     rgba(255,255,255,0.55);
+      --glass-bg:  rgba(255,255,255,0.04);
+      --glass-border: rgba(255,255,255,0.10);
+      --font-display: 'Cormorant Garamond', serif;
+      --font-body:    'DM Sans', sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: #f0eaf8;
+      font-family: var(--font-body);
+      font-size: 16px;
+      min-height: 100vh;
+      overflow-x: hidden;
+      cursor: default;
+    }
+
+    /* ============================================================
+       STAR CANVAS (background)
+    ============================================================ */
+    #star-canvas {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* ============================================================
+       CUSTOM CURSOR
+    ============================================================ */
+    .cursor-dot {
+      width: 8px; height: 8px;
+      background: var(--pink);
+      border-radius: 50%;
+      position: fixed;
+      pointer-events: none;
+      z-index: 9999;
+      transform: translate(-50%, -50%);
+      transition: transform 0.1s;
+    }
+    .cursor-ring {
+      width: 28px; height: 28px;
+      border: 1.5px solid rgba(242,167,195,0.5);
+      border-radius: 50%;
+      position: fixed;
+      pointer-events: none;
+      z-index: 9998;
+      transform: translate(-50%, -50%);
+      transition: all 0.18s ease;
+    }
+
+    /* ============================================================
+       MUSIC TOGGLE
+    ============================================================ */
+    #music-btn {
+      position: fixed;
+      top: 18px; right: 18px;
+      z-index: 100;
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      backdrop-filter: blur(12px);
+      color: var(--pink);
+      font-size: 20px;
+      width: 42px; height: 42px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    #music-btn:hover { background: rgba(242,167,195,0.15); transform: scale(1.1); }
+
+    /* ============================================================
+       CONFETTI CANVAS
+    ============================================================ */
+    #confetti-canvas {
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      pointer-events: none;
+      display: none;
+    }
+
+    /* ============================================================
+       SECTION BASE
+    ============================================================ */
+    section {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 24px;
+    }
+
+    /* ============================================================
+       GLASS CARD
+    ============================================================ */
+    .glass {
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-radius: 20px;
+      padding: 40px 36px;
+      max-width: 680px;
+      width: 100%;
+    }
+
+    /* ============================================================
+       SECTION 1 — COUNTDOWN
+    ============================================================ */
+    #countdown-section {
+      text-align: center;
+    }
+
+    .section-label {
+      font-family: var(--font-body);
+      font-size: 11px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--rose);
+      margin-bottom: 18px;
+      opacity: 0.8;
+    }
+
+    .display-title {
+      font-family: var(--font-display);
+      font-size: clamp(2.8rem, 7vw, 5rem);
+      font-weight: 300;
+      line-height: 1.1;
+      color: #fff;
+      margin-bottom: 14px;
+    }
+    .display-title em { color: var(--lavender); font-style: italic; }
+
+    .subtitle {
+      font-size: 15px;
+      color: var(--muted);
+      margin-bottom: 48px;
+      font-weight: 300;
+    }
+
+    /* Countdown boxes */
+    .countdown-grid {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 32px;
+    }
+    .cd-box {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 14px;
+      padding: 18px 24px;
+      min-width: 80px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .cd-box::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(242,167,195,0.08), rgba(181,123,238,0.08));
+    }
+    .cd-num {
+      font-family: var(--font-display);
+      font-size: 3rem;
+      font-weight: 600;
+      color: #fff;
+      display: block;
+      line-height: 1;
+    }
+    .cd-label {
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--pink);
+      margin-top: 6px;
+      display: block;
+    }
+
+    /* Birthday reveal */
+    #birthday-reveal {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      animation: fadeUp 1s ease forwards;
+    }
+    .bday-title {
+      font-family: var(--font-display);
+      font-size: clamp(3rem, 9vw, 6.5rem);
+      font-weight: 300;
+      background: linear-gradient(135deg, var(--pink), var(--purple), var(--lavender));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-align: center;
+      line-height: 1.1;
+    }
+    .bday-sub {
+      font-size: 17px;
+      color: var(--muted);
+      margin-top: 16px;
+      font-style: italic;
+      font-family: var(--font-display);
+    }
+
+    /* ============================================================
+       SECTION 2 — TYPING INTRO
+    ============================================================ */
+    #intro-section { text-align: center; }
+
+    .typing-wrap {
+      min-height: 140px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    .typing-line {
+      font-family: var(--font-display);
+      font-size: clamp(1.5rem, 4vw, 2.4rem);
+      font-weight: 300;
+      color: #f0eaf8;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .typing-line.visible { opacity: 1; transform: translateY(0); }
+    .typing-line em { color: var(--lavender); font-style: italic; }
+    .typing-cursor {
+      display: inline-block;
+      width: 2px; height: 1.1em;
+      background: var(--pink);
+      margin-left: 4px;
+      vertical-align: text-bottom;
+      animation: blink 1s infinite;
+    }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+    /* ============================================================
+       SECTION 3 — OPEN WHEN
+    ============================================================ */
+    #open-when-section {}
+
+    .section-heading {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      font-weight: 300;
+      text-align: center;
+      margin-bottom: 10px;
+      color: #fff;
+    }
+    .section-heading em { color: var(--lavender); font-style: italic; }
+
+    .section-desc {
+      text-align: center;
+      color: var(--muted);
+      font-size: 14px;
+      margin-bottom: 36px;
+      font-weight: 300;
+    }
+
+    .ow-buttons {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 14px;
+      margin-bottom: 28px;
+    }
+
+    .ow-btn {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.1);
+      color: var(--pink);
+      padding: 14px 20px;
+      border-radius: 14px;
+      font-family: var(--font-body);
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.3s;
+      text-align: center;
+    }
+    .ow-btn:hover, .ow-btn.active {
+      background: rgba(242,167,195,0.1);
+      border-color: rgba(242,167,195,0.35);
+      color: #fff;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(242,167,195,0.1);
+    }
+    .ow-btn span { display: block; font-size: 20px; margin-bottom: 6px; }
+
+    .ow-message {
+      background: rgba(255,255,255,0.04);
+      border-left: 3px solid var(--rose);
+      border-radius: 0 14px 14px 0;
+      padding: 24px 28px;
+      font-size: 15px;
+      line-height: 1.8;
+      color: #e8dff5;
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      font-weight: 300;
+      display: none;
+      animation: fadeUp 0.5s ease forwards;
+    }
+    .ow-message.visible { display: block; }
+
+    /* ============================================================
+       SECTION 4 — FAKE CHAT
+    ============================================================ */
+    #chat-section {}
+
+    .chat-window {
+      background: rgba(10,8,18,0.7);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 20px;
+      overflow: hidden;
+      max-width: 480px;
+      width: 100%;
+    }
+    .chat-header {
+      background: rgba(255,255,255,0.05);
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .chat-avatar {
+      width: 36px; height: 36px;
+      background: linear-gradient(135deg, var(--rose), var(--purple));
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+    }
+    .chat-name { font-size: 14px; font-weight: 500; color: #fff; }
+    .chat-status { font-size: 11px; color: #76d880; }
+
+    .chat-body {
+      padding: 20px 16px;
+      min-height: 320px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-height: 420px;
+      overflow-y: auto;
+    }
+    .chat-body::-webkit-scrollbar { width: 4px; }
+    .chat-body::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
+
+    .msg {
+      max-width: 75%;
+      padding: 10px 14px;
+      border-radius: 16px;
+      font-size: 14px;
+      line-height: 1.5;
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+    .msg.show { opacity: 1; transform: translateY(0); }
+    .msg.them {
+      background: rgba(255,255,255,0.08);
+      border-bottom-left-radius: 4px;
+      color: #e8dff5;
+      align-self: flex-start;
+    }
+    .msg.me {
+      background: linear-gradient(135deg, rgba(224,111,160,0.6), rgba(181,123,238,0.6));
+      border-bottom-right-radius: 4px;
+      color: #fff;
+      align-self: flex-end;
+    }
+    .msg.final-msg {
+      background: linear-gradient(135deg, rgba(224,111,160,0.8), rgba(181,123,238,0.7));
+      font-family: var(--font-display);
+      font-size: 16px;
+      font-style: italic;
+    }
+    .typing-indicator {
+      display: flex; gap: 4px; align-items: center;
+      padding: 10px 14px;
+      background: rgba(255,255,255,0.06);
+      border-radius: 16px;
+      border-bottom-left-radius: 4px;
+      align-self: flex-start;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .typing-indicator.show { opacity: 1; }
+    .typing-indicator span {
+      width: 6px; height: 6px;
+      background: rgba(255,255,255,0.5);
+      border-radius: 50%;
+      animation: typingDot 1.2s infinite;
+    }
+    .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+    .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes typingDot {
+      0%,60%,100% { transform: translateY(0); opacity: 0.4; }
+      30% { transform: translateY(-4px); opacity: 1; }
+    }
+
+    /* ============================================================
+       SECTION 5 — MINI INTERACTION
+    ============================================================ */
+    #interact-section { text-align: center; }
+
+    .hearts-area {
+      position: relative;
+      height: 200px;
+      width: 100%;
+      max-width: 500px;
+      margin: 0 auto 28px;
+      overflow: hidden;
+    }
+    .floating-heart {
+      position: absolute;
+      font-size: 28px;
+      cursor: pointer;
+      user-select: none;
+      animation: floatHeart 6s ease-in-out infinite;
+      transition: transform 0.2s;
+    }
+    .floating-heart:hover { transform: scale(1.3) !important; }
+    @keyframes floatHeart {
+      0%,100% { transform: translateY(0) rotate(-5deg); }
+      50% { transform: translateY(-20px) rotate(5deg); }
+    }
+    .pop-msg {
+      font-family: var(--font-display);
+      font-size: clamp(1.1rem, 3vw, 1.5rem);
+      font-weight: 300;
+      color: var(--lavender);
+      min-height: 50px;
+      display: flex; align-items: center; justify-content: center;
+      text-align: center;
+      padding: 0 20px;
+      opacity: 0;
+      transform: translateY(6px);
+      transition: opacity 0.4s, transform 0.4s;
+    }
+    .pop-msg.show { opacity: 1; transform: translateY(0); }
+    .click-hint {
+      font-size: 12px;
+      color: var(--muted);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+
+    /* ============================================================
+       SECTION 6 — FINAL
+    ============================================================ */
+    #final-section { text-align: center; }
+
+    .final-quote {
+      font-family: var(--font-display);
+      font-size: clamp(1.4rem, 4vw, 2.2rem);
+      font-weight: 300;
+      line-height: 1.7;
+      color: #e8dff5;
+      max-width: 560px;
+      margin: 0 auto 28px;
+    }
+    .final-quote em { color: var(--pink); font-style: italic; }
+
+    .final-sig {
+      font-size: 13px;
+      color: var(--muted);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    .gradient-divider {
+      width: 80px; height: 2px;
+      background: linear-gradient(90deg, transparent, var(--rose), var(--purple), transparent);
+      margin: 24px auto;
+      border-radius: 2px;
+    }
+
+    /* ============================================================
+       SCROLL DOWN HINT
+    ============================================================ */
+    .scroll-hint {
+      position: absolute;
+      bottom: 32px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex; flex-direction: column; align-items: center;
+      gap: 6px;
+      color: var(--muted);
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      animation: bounceDown 2s infinite;
+    }
+    .scroll-hint::after {
+      content: '↓';
+      font-size: 16px;
+    }
+    @keyframes bounceDown {
+      0%,100% { transform: translateX(-50%) translateY(0); }
+      50% { transform: translateX(-50%) translateY(6px); }
+    }
+
+    /* ============================================================
+       ANIMATIONS
+    ============================================================ */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    /* ============================================================
+       GRADIENT MESH BG for sections
+    ============================================================ */
+    .mesh-bg {
+      position: absolute; inset: 0; z-index: 0;
+      background:
+        radial-gradient(ellipse 60% 50% at 20% 30%, rgba(181,123,238,0.07) 0%, transparent 70%),
+        radial-gradient(ellipse 50% 60% at 80% 70%, rgba(224,111,160,0.07) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    /* ============================================================
+       RESPONSIVE
+    ============================================================ */
+    @media (max-width: 480px) {
+      .glass { padding: 28px 20px; }
+      .cd-box { min-width: 64px; padding: 14px 16px; }
+      .cd-num { font-size: 2.2rem; }
+      .ow-buttons { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Custom cursor -->
+<div class="cursor-dot" id="cursorDot"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- Stars background -->
+<canvas id="star-canvas"></canvas>
+
+<!-- Confetti -->
+<canvas id="confetti-canvas"></canvas>
+
+<!-- Music toggle -->
+<button id="music-btn" title="Toggle music">♪</button>
+
+<!-- Hidden audio (you can replace src with an actual audio file URL) -->
+<audio id="bg-audio" loop>
+  <!-- <source src="your-song.mp3" type="audio/mpeg"> -->
+</audio>
+
+
+<!-- ============================================================
+     SECTION 1 — COUNTDOWN
+============================================================ -->
+<section id="countdown-section">
+  <div class="mesh-bg"></div>
+
+  <!-- Live countdown -->
+  <div id="countdown-wrap" style="text-align:center; z-index:1; position:relative;">
+    <p class="section-label">A little something I made</p>
+    <h1 class="display-title">Something's coming <em>soon...</em></h1>
+    <p class="subtitle">Just counting down to your special day</p>
+
+    <div class="countdown-grid">
+      <div class="cd-box"><span class="cd-num" id="cd-days">00</span><span class="cd-label">Days</span></div>
+      <div class="cd-box"><span class="cd-num" id="cd-hours">00</span><span class="cd-label">Hours</span></div>
+      <div class="cd-box"><span class="cd-num" id="cd-mins">00</span><span class="cd-label">Minutes</span></div>
+      <div class="cd-box"><span class="cd-num" id="cd-secs">00</span><span class="cd-label">Seconds</span></div>
+    </div>
+  </div>
+
+  <!-- Birthday reveal (hidden until countdown = 0) -->
+  <div id="birthday-reveal" style="z-index:1; position:relative; flex-direction:column; align-items:center;">
+    <h1 class="bday-title">Happy Birthday ❤️</h1>
+    <p class="bday-sub">I remembered. Of course I did.</p>
+
+    <!-- Interactive cake -->
+    <div style="position:relative; margin: 28px auto 0; text-align:center;">
+      <canvas id="cake-canvas" width="260" height="260" style="display:block; margin:0 auto; cursor:pointer;"></canvas>
+      <p id="cake-hint" style="color:var(--muted); font-size:13px; margin-top:14px; letter-spacing:1px; transition: opacity 0.5s;">
+        tap allow on the mic, then blow 🎤🕯️
+      </p>
+    </div>
+
+    <p style="color:var(--muted); font-size:13px; margin-top:20px;">Scroll down ↓</p>
+  </div>
+
+  <div class="scroll-hint" id="scroll-hint">scroll</div>
+</section>
+
+
+<!-- ============================================================
+     SECTION 2 — TYPING INTRO
+============================================================ -->
+<section id="intro-section">
+  <div class="mesh-bg"></div>
+  <div class="glass reveal" style="position:relative; z-index:1; text-align:center;">
+    <p class="section-label">A few words</p>
+    <div class="typing-wrap" id="typing-wrap">
+      <!-- lines injected by JS -->
+    </div>
+  </div>
+</section>
+
+
+<!-- ============================================================
+     SECTION 3 — OPEN WHEN
+============================================================ -->
+<section id="open-when-section">
+  <div class="mesh-bg"></div>
+  <div style="position:relative; z-index:1; width:100%; max-width:680px;">
+    <h2 class="section-heading reveal"><em>Open when...</em></h2>
+    <p class="section-desc reveal">Click whichever one fits right now.</p>
+
+    <div class="ow-buttons reveal">
+      <button class="ow-btn" onclick="openWhen(this, 'sad')">
+        <span>😔</span>you're sad
+      </button>
+      <button class="ow-btn" onclick="openWhen(this, 'miss')">
+        <span>🌙</span>you miss me
+      </button>
+      <button class="ow-btn" onclick="openWhen(this, 'sleep')">
+        <span>🌌</span>you can't sleep
+      </button>
+      <button class="ow-btn" onclick="openWhen(this, 'birthday')">
+        <span>🎂</span>it's your birthday
+      </button>
+    </div>
+
+    <div class="ow-message glass reveal" id="ow-message"></div>
+  </div>
+</section>
+
+
+<!-- ============================================================
+     SECTION 4 — FAKE CHAT
+============================================================ -->
+<section id="chat-section">
+  <div class="mesh-bg"></div>
+  <div style="position:relative; z-index:1; width:100%; display:flex; flex-direction:column; align-items:center; gap:24px;">
+    <h2 class="section-heading reveal">Remember <em>this?</em></h2>
+    <p class="section-desc reveal">A little throwback.</p>
+
+    <div class="chat-window reveal">
+      <div class="chat-header">
+        <div class="chat-avatar">🌸</div>
+        <div>
+          <div class="chat-name">her 🌸</div>
+          <div class="chat-status">● active now</div>
+        </div>
+      </div>
+      <div class="chat-body" id="chat-body">
+        <!-- messages injected by JS -->
+        <div class="typing-indicator" id="typing-ind">
+          <span></span><span></span><span></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ============================================================
+     SECTION 5 — MINI INTERACTION
+============================================================ -->
+<section id="interact-section">
+  <div class="mesh-bg"></div>
+  <div style="position:relative; z-index:1; width:100%; display:flex; flex-direction:column; align-items:center;">
+    <h2 class="section-heading reveal">You deserve <em>all of this</em></h2>
+    <p class="section-desc reveal" style="margin-bottom:28px;">Click the hearts. Go on.</p>
+
+    <div class="hearts-area reveal" id="hearts-area">
+      <!-- hearts injected by JS -->
+    </div>
+
+    <p class="click-hint">tap a heart</p>
+    <div class="pop-msg" id="pop-msg">...</div>
+  </div>
+</section>
+
+
+<!-- ============================================================
+     SECTION 6 — FINAL
+============================================================ -->
+<section id="final-section">
+  <div class="mesh-bg"></div>
+  <div class="glass reveal" style="position:relative; z-index:1; text-align:center;">
+    <p class="section-label">And finally...</p>
+    <div class="gradient-divider"></div>
+    <p class="final-quote">
+      We may not be what we were —<br/>
+      but <em>you still matter to me.</em><br/>
+      Always will.
+    </p>
+    <div class="gradient-divider"></div>
+    <p style="font-family:var(--font-display); font-size:1.4rem; color:var(--pink); margin-bottom:20px;">
+      Happy Birthday. 🎂
+    </p>
+    <p class="final-sig">made with something that never really went away</p>
+  </div>
+</section>
+
+
+<script>
+/* ============================================================
+   BIRTHDAY DATE — ✏️ CHANGE THIS to her actual birthday
+   Format: "YYYY-MM-DDT00:00:00+07:00"  (Vietnam time, UTC+7)
+   This works correctly no matter where the user opens the site.
+============================================================ */
+const BIRTHDAY = new Date("2026-04-26T00:00:00+07:00"); // Vietnam time (UTC+7)
+
+
+/* ============================================================
+   STAR BACKGROUND
+============================================================ */
+(function() {
+  const canvas = document.getElementById('star-canvas');
+  const ctx = canvas.getContext('2d');
+  let stars = [];
+
+  function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+
+  function makeStars() {
+    stars = [];
+    for (let i = 0; i < 180; i++) {
+      stars.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        r: Math.random() * 1.4 + 0.2,
+        a: Math.random(),
+        speed: Math.random() * 0.003 + 0.001,
+        phase: Math.random() * Math.PI * 2
+      });
+    }
+  }
+
+  function drawStars(t) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    stars.forEach(s => {
+      const alpha = 0.3 + 0.6 * (Math.sin(t * s.speed + s.phase) * 0.5 + 0.5);
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(212,179,247,${alpha})`;
+      ctx.fill();
+    });
+    requestAnimationFrame(drawStars);
+  }
+
+  resize();
+  makeStars();
+  window.addEventListener('resize', () => { resize(); makeStars(); });
+  requestAnimationFrame(drawStars);
+})();
+
+
+/* ============================================================
+   CUSTOM CURSOR
+============================================================ */
+(function() {
+  const dot = document.getElementById('cursorDot');
+  const ring = document.getElementById('cursorRing');
+  let rx = 0, ry = 0;
+
+  document.addEventListener('mousemove', e => {
+    dot.style.left = e.clientX + 'px';
+    dot.style.top  = e.clientY + 'px';
+    // ring lags slightly
+    rx += (e.clientX - rx) * 0.15;
+    ry += (e.clientY - ry) * 0.15;
+    ring.style.left = rx + 'px';
+    ring.style.top  = ry + 'px';
+  });
+
+  function animRing() {
+    requestAnimationFrame(animRing);
+  }
+  animRing();
+})();
+
+
+/* ============================================================
+   MUSIC TOGGLE
+============================================================ */
+const musicBtn = document.getElementById('music-btn');
+const audio = document.getElementById('bg-audio');
+let musicOn = false;
+
+musicBtn.addEventListener('click', () => {
+  if (!audio.src) {
+    alert('Add a music file URL to the <audio> src to enable music!');
+    return;
+  }
+  if (musicOn) {
+    audio.pause(); musicBtn.textContent = '♪'; musicOn = false;
+  } else {
+    audio.play(); musicBtn.textContent = '■'; musicOn = true;
+  }
+});
+
+
+/* ============================================================
+   COUNTDOWN TIMER
+============================================================ */
+// Target timestamp in milliseconds — locked to Vietnam midnight (UTC+7)
+// Works correctly for anyone opening the site anywhere in the world.
+const TARGET_MS = BIRTHDAY.getTime();
+
+let birthdayTriggered = false;
+
+function updateCountdown() {
+  const now = Date.now(); // current UTC ms, same everywhere
+  const diff = TARGET_MS - now;
+
+  if (diff <= 0) {
+    if (!birthdayTriggered) {
+      birthdayTriggered = true;
+      document.getElementById('countdown-wrap').style.display = 'none';
+      const reveal = document.getElementById('birthday-reveal');
+      reveal.style.display = 'flex';
+      document.getElementById('scroll-hint').style.display = 'none';
+      startConfetti();
+    }
+    return;
+  }
+
+  const days  = Math.floor(diff / 86400000);
+  const hours = Math.floor((diff % 86400000) / 3600000);
+  const mins  = Math.floor((diff % 3600000) / 60000);
+  const secs  = Math.floor((diff % 60000) / 1000);
+
+  document.getElementById('cd-days').textContent  = String(days).padStart(2,'0');
+  document.getElementById('cd-hours').textContent = String(hours).padStart(2,'0');
+  document.getElementById('cd-mins').textContent  = String(mins).padStart(2,'0');
+  document.getElementById('cd-secs').textContent  = String(secs).padStart(2,'0');
+}
+
+updateCountdown();
+setInterval(updateCountdown, 1000);
+
+
+/* ============================================================
+   CONFETTI
+============================================================ */
+function startConfetti() {
+  const canvas = document.getElementById('confetti-canvas');
+  canvas.style.display = 'block';
+  const ctx = canvas.getContext('2d');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  const pieces = [];
+  const colors = ['#f2a7c3','#e06fa0','#b57bee','#d4b3f7','#fff4e0','#ff9dc6'];
+
+  for (let i = 0; i < 200; i++) {
+    pieces.push({
+      x: Math.random() * canvas.width,
+      y: -Math.random() * canvas.height,
+      w: Math.random() * 8 + 4,
+      h: Math.random() * 12 + 4,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      vx: (Math.random() - 0.5) * 3,
+      vy: Math.random() * 4 + 2,
+      rot: Math.random() * Math.PI * 2,
+      rotv: (Math.random() - 0.5) * 0.15
+    });
+  }
+
+  let frame = 0;
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    pieces.forEach(p => {
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.rot);
+      ctx.fillStyle = p.color;
+      ctx.globalAlpha = 0.85;
+      ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
+      ctx.restore();
+      p.x += p.vx;
+      p.y += p.vy;
+      p.rot += p.rotv;
+      if (p.y > canvas.height) { p.y = -10; p.x = Math.random() * canvas.width; }
+    });
+    frame++;
+    if (frame < 350) requestAnimationFrame(draw);
+    else canvas.style.display = 'none';
+  }
+  draw();
+}
+
+
+/* ============================================================
+   SCROLL REVEAL
+============================================================ */
+const reveals = document.querySelectorAll('.reveal');
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('visible');
+      // Trigger typing when intro section visible
+      if (e.target.closest('#intro-section')) startTyping();
+      // Trigger chat when chat section visible
+      if (e.target.closest('#chat-section')) startChat();
+    }
+  });
+}, { threshold: 0.2 });
+reveals.forEach(r => observer.observe(r));
+
+
+/* ============================================================
+   TYPING INTRO
+============================================================ */
+const typingLines = [
+  "Hey...",
+  "I know things are different now.",
+  "But you still crossed my mind today.",
+  "<em>Actually, you cross my mind a lot.</em>",
+  "So I made this for you.",
+  "Happy Birthday. 🌸"
+];
+
+let typingDone = false;
+function startTyping() {
+  if (typingDone) return;
+  typingDone = true;
+
+  const wrap = document.getElementById('typing-wrap');
+  wrap.innerHTML = '';
+
+  typingLines.forEach((line, i) => {
+    const el = document.createElement('p');
+    el.className = 'typing-line';
+    el.innerHTML = line + (i === typingLines.length - 1 ? '<span class="typing-cursor"></span>' : '');
+    wrap.appendChild(el);
+
+    setTimeout(() => {
+      el.classList.add('visible');
+    }, i * 900 + 400);
+  });
+}
+
+
+/* ============================================================
+   OPEN WHEN MESSAGES
+============================================================ */
+const owMessages = {
+  sad: `Hey. I know today feels heavy. I don't know exactly what happened, but I know this — you've carried hard things before, and you're still here, still going. That counts for a lot. You're allowed to feel it. Just don't stay in it too long. You're too good at being alive to let a bad day win. 🌙`,
+  miss: `Yeah. Me too, sometimes. But missing someone doesn't have to hurt — it can just mean they mattered. And you did. You do. I hope you're okay, wherever you are tonight. I hope your room feels warm and your thoughts don't keep you up.`,
+  sleep: `3am thoughts are the loudest, aren't they? Close your eyes. Think about the ocean. Or rain on a window. Or that feeling when you pull a blanket up and everything goes quiet for a second. You're fine. Everything is fine. Tomorrow exists and it'll be softer, I promise. 🌌`,
+  birthday: `Okay so you opened this one on the right day. That's actually perfect. I made this whole thing because I didn't want the day to just pass by without you knowing someone thought of you. You matter. You really do. Happy Birthday — I mean that in the fullest, most sincere way. 🎂❤️`
+};
+
+function openWhen(btn, key) {
+  document.querySelectorAll('.ow-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+
+  const box = document.getElementById('ow-message');
+  box.classList.remove('visible');
+  box.innerHTML = owMessages[key];
+
+  setTimeout(() => box.classList.add('visible'), 10);
+}
+
+
+/* ============================================================
+   FAKE CHAT
+============================================================ */
+const chatMessages = [
+  { side: 'them', text: 'hey are u busy' },
+  { side: 'me',   text: 'for you? never lol' },
+  { side: 'them', text: 'ok good. so i had the weirdest dream' },
+  { side: 'me',   text: 'let me guess. dinosaurs?' },
+  { side: 'them', text: 'how did you KNOW' },
+  { side: 'me',   text: 'i know everything 😌' },
+  { side: 'them', text: 'you know nothing 💀' },
+  { side: 'me',   text: 'fair. but i know your coffee order' },
+  { side: 'them', text: 'ok FINE you know one (1) thing' },
+  { side: 'me',   text: 'and i know your laugh is the best sound i\'ve heard' },
+  { side: 'them', text: '...' },
+  { side: 'them', text: 'why are you like this' },
+  { side: 'me',   text: 'because it\'s true.' },
+  { side: 'me',   text: 'Still my favorite person. Happy Birthday ❤️', cls: 'final-msg' }
+];
+
+let chatDone = false;
+function startChat() {
+  if (chatDone) return;
+  chatDone = true;
+
+  const body = document.getElementById('chat-body');
+  const typInd = document.getElementById('typing-ind');
+
+  let i = 0;
+  function nextMsg() {
+    if (i >= chatMessages.length) {
+      typInd.classList.remove('show');
+      return;
+    }
+    const m = chatMessages[i];
+
+    typInd.classList.remove('show');
+    // Show typing indicator briefly
+    if (m.side === 'me') {
+      // send immediately after short delay
+      setTimeout(() => addMsg(m), 300);
+    } else {
+      typInd.classList.add('show');
+      body.appendChild(typInd); // move to end
+      setTimeout(() => { typInd.classList.remove('show'); addMsg(m); }, 1200);
+    }
+
+    i++;
+  }
+
+  function addMsg(m) {
+    const el = document.createElement('div');
+    el.className = `msg ${m.side}${m.cls ? ' ' + m.cls : ''}`;
+    el.textContent = m.text;
+    body.insertBefore(el, typInd);
+    setTimeout(() => el.classList.add('show'), 30);
+    body.scrollTop = body.scrollHeight;
+    setTimeout(nextMsg, 900 + Math.random() * 400);
+  }
+
+  setTimeout(nextMsg, 800);
+}
+
+
+/* ============================================================
+   FLOATING HEARTS INTERACTION
+============================================================ */
+const heartEmojis = ['❤️','🩷','💜','🤍','💗','🌸','✨'];
+const popMessages = [
+  "You deserve the whole sky.",
+  "I'm really glad you exist.",
+  "Okay don't make it weird but… I miss talking to you sometimes.",
+  "You have the best laugh. Just saying.",
+  "You're the kind of person people write songs about.",
+  "Still rooting for you. Always.",
+  "Genuinely one of the coolest people I know.",
+  "I hope this year is everything you deserve.",
+  "No one does *you* better than you.",
+  "Happy birthday, weirdo ❤️",
+  "You made my world a little warmer.",
+  "Some people just stick with you. You're one of them."
+];
+
+(function initHearts() {
+  const area = document.getElementById('hearts-area');
+  for (let i = 0; i < 7; i++) {
+    const h = document.createElement('div');
+    h.className = 'floating-heart';
+    h.textContent = heartEmojis[i % heartEmojis.length];
+    h.style.left = (8 + i * 13) + '%';
+    h.style.top  = (10 + (i % 3) * 28) + '%';
+    h.style.animationDelay = (i * 0.8) + 's';
+    h.style.animationDuration = (4 + i * 0.7) + 's';
+    h.addEventListener('click', () => {
+      const msg = popMessages[Math.floor(Math.random() * popMessages.length)];
+      const pop = document.getElementById('pop-msg');
+      pop.classList.remove('show');
+      setTimeout(() => {
+        pop.textContent = msg;
+        pop.classList.add('show');
+      }, 50);
+      // mini bounce
+      h.style.transform = 'scale(1.5)';
+      setTimeout(() => h.style.transform = '', 300);
+    });
+    area.appendChild(h);
+  }
+})();
+
+
+/* ============================================================
+   INTERACTIVE BIRTHDAY CAKE
+   - Drawn on canvas
+   - 5 candles, each with animated flame
+   - Tap/click a candle to blow it out (smoke puff effect)
+   - When all blown: celebratory message
+   - Works on PC (click) and iOS (touch)
+============================================================ */
+(function initCake() {
+  const canvas = document.getElementById('cake-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+
+  const W = canvas.width;
+  const H = canvas.height;
+
+  // Candle state: 5 candles
+  const NUM_CANDLES = 5;
+  const candles = [];
+
+  // Cake dimensions
+  const cakeX = W / 2;
+  const cakeBottomY = H - 20;
+  const cakeW = 200;
+  const cakeH1 = 44; // bottom tier
+  const cakeH2 = 38; // top tier
+  const tier1Y = cakeBottomY - cakeH1;
+  const tier2Y = tier1Y - cakeH2;
+
+  // Place candles evenly on top tier
+  const candleW = 12;
+  const candleH = 36;
+  const spread = 120;
+  for (let i = 0; i < NUM_CANDLES; i++) {
+    const cx = cakeX - spread/2 + (spread / (NUM_CANDLES - 1)) * i;
+    const cy = tier2Y;
+    candles.push({
+      x: cx,
+      y: cy,
+      lit: true,
+      smokeParticles: [],
+      flickerOffset: Math.random() * Math.PI * 2
+    });
+  }
+
+  let allBlown = false;
+  let allBlownTimer = 0;
+
+  // Smoke particle constructor
+  function makeSmoke(cx, cy) {
+    return {
+      x: cx,
+      y: cy - candleH,
+      vx: (Math.random() - 0.5) * 0.8,
+      vy: -Math.random() * 1.2 - 0.4,
+      alpha: 0.7,
+      r: Math.random() * 4 + 3
+    };
+  }
+
+  // Draw the cake
+  function drawCake() {
+    // Bottom tier
+    const grad1 = ctx.createLinearGradient(cakeX - cakeW/2, tier1Y, cakeX + cakeW/2, cakeBottomY);
+    grad1.addColorStop(0, '#e06fa0');
+    grad1.addColorStop(1, '#b57bee');
+    ctx.fillStyle = grad1;
+    ctx.beginPath();
+    ctx.roundRect(cakeX - cakeW/2, tier1Y, cakeW, cakeH1, [0, 0, 12, 12]);
+    ctx.fill();
+
+    // Bottom tier frosting drips
+    ctx.fillStyle = 'rgba(255,255,255,0.18)';
+    for (let i = 0; i < 6; i++) {
+      const dx = cakeX - cakeW/2 + 16 + i * 34;
+      ctx.beginPath();
+      ctx.ellipse(dx, tier1Y + 6, 7, 9, 0, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // Top tier
+    const topW = cakeW * 0.7;
+    const grad2 = ctx.createLinearGradient(cakeX - topW/2, tier2Y, cakeX + topW/2, tier1Y);
+    grad2.addColorStop(0, '#f2a7c3');
+    grad2.addColorStop(1, '#d4b3f7');
+    ctx.fillStyle = grad2;
+    ctx.beginPath();
+    ctx.roundRect(cakeX - topW/2, tier2Y, topW, cakeH2, [0, 0, 8, 8]);
+    ctx.fill();
+
+    // Top tier frosting drips
+    ctx.fillStyle = 'rgba(255,255,255,0.2)';
+    for (let i = 0; i < 4; i++) {
+      const dx = cakeX - topW/2 + 14 + i * 30;
+      ctx.beginPath();
+      ctx.ellipse(dx, tier2Y + 5, 6, 8, 0, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // Plate / base shadow
+    ctx.fillStyle = 'rgba(0,0,0,0.18)';
+    ctx.beginPath();
+    ctx.ellipse(cakeX, cakeBottomY + 4, cakeW/2 + 10, 8, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Her name on the bottom tier with a soft glow
+    ctx.save();
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    const nameY = tier1Y + cakeH1 / 2 + 2;
+
+    // Glow effect
+    ctx.shadowColor = 'rgba(255,200,220,0.8)';
+    ctx.shadowBlur = 8;
+
+    // Decorative stars either side
+    ctx.fillStyle = 'rgba(255,255,255,0.7)';
+    ctx.font = '10px serif';
+    ctx.fillText('✦', cakeX - 72, nameY);
+    ctx.fillText('✦', cakeX + 72, nameY);
+
+    // Name text
+    ctx.shadowBlur = 12;
+    ctx.fillStyle = '#ffffff';
+    ctx.font = "italic 300 15px 'Cormorant Garamond', serif";
+    ctx.fillText('Vu Ha Vy', cakeX, nameY);
+
+    ctx.restore();
+  }
+
+  // Draw candles and flames
+  function drawCandles(t) {
+    candles.forEach((c, idx) => {
+      // Candle body
+      const cg = ctx.createLinearGradient(c.x - candleW/2, c.y - candleH, c.x + candleW/2, c.y);
+      cg.addColorStop(0, '#fff4e0');
+      cg.addColorStop(1, '#ffe0b2');
+      ctx.fillStyle = cg;
+      ctx.beginPath();
+      ctx.roundRect(c.x - candleW/2, c.y - candleH, candleW, candleH, 4);
+      ctx.fill();
+
+      // Stripe on candle
+      ctx.fillStyle = 'rgba(242,167,195,0.5)';
+      for (let s = 0; s < 3; s++) {
+        ctx.fillRect(c.x - candleW/2, c.y - candleH + 8 + s * 10, candleW, 3);
+      }
+
+      // Wick
+      ctx.strokeStyle = '#555';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(c.x, c.y - candleH);
+      ctx.lineTo(c.x, c.y - candleH - 6);
+      ctx.stroke();
+
+      if (c.lit) {
+        // Flame flicker
+        const flicker = Math.sin(t * 0.006 + c.flickerOffset) * 2;
+        const flicker2 = Math.cos(t * 0.009 + c.flickerOffset) * 1.5;
+        const flameH = 18 + flicker;
+        const flameW = 8 + Math.abs(flicker2);
+        const fx = c.x + flicker2 * 0.4;
+        const fy = c.y - candleH - 6;
+
+        // Outer glow
+        const glowGrad = ctx.createRadialGradient(fx, fy - flameH/2, 0, fx, fy - flameH/2, flameW * 2);
+        glowGrad.addColorStop(0, 'rgba(255,200,80,0.25)');
+        glowGrad.addColorStop(1, 'rgba(255,100,50,0)');
+        ctx.fillStyle = glowGrad;
+        ctx.beginPath();
+        ctx.ellipse(fx, fy - flameH/2, flameW * 2, flameH * 1.2, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Flame body
+        const flameGrad = ctx.createLinearGradient(fx, fy, fx, fy - flameH);
+        flameGrad.addColorStop(0, '#ff6600');
+        flameGrad.addColorStop(0.4, '#ffaa00');
+        flameGrad.addColorStop(1, '#fff5c0');
+        ctx.fillStyle = flameGrad;
+        ctx.beginPath();
+        ctx.moveTo(fx, fy);
+        ctx.bezierCurveTo(fx - flameW, fy - flameH * 0.4, fx - flameW * 0.5, fy - flameH * 0.8, fx, fy - flameH);
+        ctx.bezierCurveTo(fx + flameW * 0.5, fy - flameH * 0.8, fx + flameW, fy - flameH * 0.4, fx, fy);
+        ctx.fill();
+
+        // Inner bright core
+        const innerGrad = ctx.createLinearGradient(fx, fy - 2, fx, fy - flameH * 0.6);
+        innerGrad.addColorStop(0, 'rgba(255,255,200,0.9)');
+        innerGrad.addColorStop(1, 'rgba(255,200,50,0)');
+        ctx.fillStyle = innerGrad;
+        ctx.beginPath();
+        ctx.ellipse(fx, fy - flameH * 0.3, flameW * 0.4, flameH * 0.4, 0, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // Smoke particles
+      c.smokeParticles.forEach(p => {
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(200,200,220,${p.alpha})`;
+        ctx.fill();
+      });
+    });
+  }
+
+  // Draw "all blown" message on canvas
+  function drawAllBlown() {
+    ctx.fillStyle = 'rgba(255,255,255,0.0)';
+    ctx.clearRect(0, 0, W, H);
+    drawCake();
+    drawCandles(0);
+
+    // Fade in text
+    const alpha = Math.min(1, (allBlownTimer / 60));
+    ctx.fillStyle = `rgba(242,167,195,${alpha})`;
+    ctx.font = `italic 300 22px 'Cormorant Garamond', serif`;
+    ctx.textAlign = 'center';
+    ctx.fillText('Make a wish... ✨', W/2, tier2Y - 48);
+
+    const hint = document.getElementById('cake-hint');
+    if (hint) hint.style.opacity = '0';
+  }
+
+  // Animation loop
+  let animFrame;
+  function loop(t) {
+    ctx.clearRect(0, 0, W, H);
+
+    // Update smoke
+    candles.forEach(c => {
+      if (!c.lit && c.smokeParticles.length < 18) {
+        c.smokeParticles.push(makeSmoke(c.x, c.y));
+      }
+      c.smokeParticles.forEach(p => {
+        p.x += p.vx;
+        p.y += p.vy;
+        p.alpha -= 0.012;
+        p.r += 0.08;
+      });
+      c.smokeParticles = c.smokeParticles.filter(p => p.alpha > 0);
+    });
+
+    drawCake();
+    drawCandles(t);
+
+    const litCount = candles.filter(c => c.lit).length;
+    if (litCount === 0 && !allBlown) {
+      allBlown = true;
+    }
+    if (allBlown) {
+      allBlownTimer++;
+      const alpha = Math.min(1, allBlownTimer / 60);
+      ctx.fillStyle = `rgba(242,167,195,${alpha})`;
+      ctx.font = `italic 300 22px 'Cormorant Garamond', serif`;
+      ctx.textAlign = 'center';
+      ctx.fillText('Make a wish... ✨', W/2, tier2Y - 52);
+
+      if (allBlownTimer === 1) {
+        const hint = document.getElementById('cake-hint');
+        if (hint) hint.style.opacity = '0';
+      }
+    }
+
+    animFrame = requestAnimationFrame(loop);
+  }
+
+  // Hit test — is point (px, py) on a candle flame or body?
+  function hitCandle(px, py) {
+    for (let i = 0; i < candles.length; i++) {
+      const c = candles[i];
+      if (!c.lit) continue;
+      // hit box: candle body + flame area
+      if (
+        px >= c.x - 14 && px <= c.x + 14 &&
+        py >= c.y - candleH - 26 && py <= c.y
+      ) return i;
+    }
+    return -1;
+  }
+
+  function blowCandle(idx) {
+    if (idx < 0 || idx >= candles.length) return;
+    candles[idx].lit = false;
+    // seed initial smoke burst
+    for (let k = 0; k < 8; k++) candles[idx].smokeParticles.push(makeSmoke(candles[idx].x, candles[idx].y));
+  }
+
+  // Get canvas-relative coordinates (handles mobile scaling)
+  function getPos(e) {
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = W / rect.width;
+    const scaleY = H / rect.height;
+    let cx, cy;
+    if (e.touches) {
+      cx = (e.touches[0].clientX - rect.left) * scaleX;
+      cy = (e.touches[0].clientY - rect.top) * scaleY;
+    } else {
+      cx = (e.clientX - rect.left) * scaleX;
+      cy = (e.clientY - rect.top) * scaleY;
+    }
+    return { x: cx, y: cy };
+  }
+
+  // PC click (keep as fallback)
+  canvas.addEventListener('click', e => {
+    const { x, y } = getPos(e);
+    const idx = hitCandle(x, y);
+    if (idx !== -1) blowCandle(idx);
+  });
+
+  // iOS / mobile touch (keep as fallback)
+  canvas.addEventListener('touchstart', e => {
+    e.preventDefault();
+    const { x, y } = getPos(e);
+    const idx = hitCandle(x, y);
+    if (idx !== -1) blowCandle(idx);
+  }, { passive: false });
+
+  /* ----------------------------------------------------------
+     MIC BLOW DETECTION
+     Uses Web Audio API to detect a sudden loud burst of air.
+     Works on iPhone Safari and PC Chrome/Firefox.
+     Browser will ask for mic permission once.
+  ---------------------------------------------------------- */
+  let micReady = false;
+  let blowCooldown = false;
+
+  function initMic() {
+    if (micReady) return;
+    micReady = true;
+
+    const hint = document.getElementById('cake-hint');
+
+    navigator.mediaDevices.getUserMedia({ audio: true, video: false })
+      .then(stream => {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const source = audioCtx.createMediaStreamSource(stream);
+        const analyser = audioCtx.createAnalyser();
+        analyser.fftSize = 256;
+        analyser.smoothingTimeConstant = 0.3;
+        source.connect(analyser);
+
+        const dataArray = new Uint8Array(analyser.frequencyBinCount);
+
+        // Update hint once mic is active
+        if (hint) hint.textContent = '🎤 blow into your mic to put out the candles';
+
+        function detectBlow() {
+          analyser.getByteFrequencyData(dataArray);
+
+          // Average volume across low-mid frequencies (blow = broadband noise burst)
+          let sum = 0;
+          for (let i = 0; i < dataArray.length; i++) sum += dataArray[i];
+          const avg = sum / dataArray.length;
+
+          // Threshold: avg > 28 = a blow (not just ambient noise)
+          if (avg > 28 && !blowCooldown && !allBlown) {
+            blowCooldown = true;
+
+            // Blow out the next lit candle
+            const litIdx = candles.findIndex(c => c.lit);
+            if (litIdx !== -1) {
+              blowCandle(litIdx);
+            }
+
+            // Cooldown so one blow = one candle (not all at once)
+            setTimeout(() => { blowCooldown = false; }, 600);
+          }
+
+          requestAnimationFrame(detectBlow);
+        }
+
+        detectBlow();
+      })
+      .catch(() => {
+        // Mic denied — update hint so she knows to tap instead
+        if (hint) hint.textContent = 'mic not available — tap each candle to blow it out 🕯️';
+      });
+  }
+
+  // Start mic when birthday reveal is shown
+  const revealEl = document.getElementById('birthday-reveal');
+  const cakeObserver = new MutationObserver(() => {
+    if (revealEl.style.display === 'flex') {
+      requestAnimationFrame(loop);
+      setTimeout(initMic, 800); // slight delay so page has settled
+      cakeObserver.disconnect();
+    }
+  });
+  cakeObserver.observe(revealEl, { attributes: true, attributeFilter: ['style'] });
+
+  // Also start immediately if already shown (birthday already passed)
+  if (revealEl.style.display === 'flex') {
+    requestAnimationFrame(loop);
+    setTimeout(initMic, 800);
+  }
+})();
+
+</script>
+</body>
+</html>
